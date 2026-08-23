@@ -25,7 +25,7 @@ services:
       JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET is required}
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-30d}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8081}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:81}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
       PORT: "4000"
     depends_on:
@@ -37,7 +37,10 @@ services:
     build: ./frontend
     restart: unless-stopped
     ports:
-      - "8081:80"
+      # Port 80, not 8081: Cloudflare's proxy (orange cloud) only forwards
+      # a fixed allow-list of ports, and 8081 isn't on it. Plain 80 works
+      # with Cloudflare's default "Flexible" SSL out of the box.
+      - "80:80"
     depends_on:
       - backend
 
