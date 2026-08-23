@@ -10,10 +10,6 @@ const ERROR_MESSAGES: Record<string, Record<Lang, string>> = {
     ru: "Неверный email или пароль",
     en: "Invalid email or password",
   },
-  AUTH_EMAIL_ALREADY_REGISTERED: {
-    ru: "Этот email уже зарегистрирован",
-    en: "This email is already registered",
-  },
   AUTH_REFRESH_TOKEN_MISSING: {
     ru: "Сессия истекла — войдите снова",
     en: "Your session has expired — please sign in again",
