@@ -25,7 +25,7 @@ services:
       JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET is required}
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-30d}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:81}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
       PORT: "4000"
     depends_on:
@@ -37,10 +37,15 @@ services:
     build: ./frontend
     restart: unless-stopped
     ports:
-      # Port 80, not 8081: Cloudflare's proxy (orange cloud) only forwards
-      # a fixed allow-list of ports, and 8081 isn't on it. Plain 80 works
-      # with Cloudflare's default "Flexible" SSL out of the box.
-      - "80:80"
+      # Published directly (not loopback) — this box's own port 80/443
+      # already belong to a separate, unrelated nginx setup, so this
+      # stack gets its own port instead of trying to integrate with that.
+      # NOTE: 81 is not in Cloudflare's proxy allow-list (only 80, 8080,
+      # 8880, 2052/2082/2086/2095 for HTTP), so the Cloudflare DNS record
+      # for this host must be "DNS only" (grey cloud), not "Proxied" — no
+      # Cloudflare TLS/CDN for this site, and the URL needs the port:
+      # http://cvv.youmove.app:81. See root README.md.
+      - "${NGINX_PORT:-81}:80"
     depends_on:
       - backend
 
