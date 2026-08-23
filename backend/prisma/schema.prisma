@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String   @id @default(uuid())
+  email            String   @unique
+  passwordHash     String
+  name             String
+  refreshTokenHash String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("users")
+}
+
+model SkillGroup {
+  id        String   @id @default(uuid())
+  order     Int      @default(0)
+  titleRu   String
+  titleEn   String
+  skills    Skill[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("skill_groups")
+}
+
+model Skill {
+  id           String     @id @default(uuid())
+  order        Int        @default(0)
+  nameRu       String
+  nameEn       String
+  skillGroup   SkillGroup @relation(fields: [skillGroupId], references: [id], onDelete: Cascade)
+  skillGroupId String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("skills")
+}
+
+model Experience {
+  id            String   @id @default(uuid())
+  order         Int      @default(0)
+  titleRu       String
+  titleEn       String
+  placeRu       String
+  placeEn       String
+  periodRu      String
+  periodEn      String
+  descriptionRu String   @db.Text
+  descriptionEn String   @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("experience_entries")
+}
+
+// Singleton — один сайт, одна личная информация. id всегда "main".
+model Profile {
+  id String @id @default("main")
+
+  nameRu     String @default("")
+  nameEn     String @default("")
+  roleRu     String @default("")
+  roleEn     String @default("")
+  locationRu String @default("")
+  locationEn String @default("")
+  avatarUrl  String @default("")
+
+  bioShortRu String @default("") @db.Text
+  bioShortEn String @default("") @db.Text
+  bioFullRu  String @default("") @db.Text
+  bioFullEn  String @default("") @db.Text
+
+  email    String @default("")
+  phone    String @default("")
+  telegram String @default("")
+  github   String @default("")
+
+  educationPlaceRu  String @default("")
+  educationPlaceEn  String @default("")
+  educationCityRu   String @default("")
+  educationCityEn   String @default("")
+  educationYear     String @default("")
+  educationDegreeRu String @default("")
+  educationDegreeEn String @default("")
+  educationMajorRu  String @default("")
+  educationMajorEn  String @default("")
+
+  facts     ProfileFact[]
+  languages ProfileLanguage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("profile")
+}
+
+model ProfileFact {
+  id        String  @id @default(uuid())
+  order     Int     @default(0)
+  textRu    String
+  textEn    String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String  @default("main")
+
+  @@map("profile_facts")
+}
+
+model ProfileLanguage {
+  id        String  @id @default(uuid())
+  order     Int     @default(0)
+  nameRu    String
+  nameEn    String
+  levelRu   String
+  levelEn   String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String  @default("main")
+
+  @@map("profile_languages")
+}
